@@ -1,0 +1,40 @@
+<ion-view title="Proposition">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="has-header">
+        <div class="list">
+            <div class="item">
+                Name: <h1>{{proposition.name}}</h1>
+            </div>
+            <div class="item">
+                Description: <h2>{{proposition.description}}</h2>
+            </div>
+            <div class="item">
+                Keywords: <h3>{{proposition.keywords}}</h3>
+            </div>
+            <div class="item item-divider">
+                Options
+            </div>
+            <div class="item item-input item-stacked-label" ng-repeat="option in proposition.options">
+                <div class="row">
+                    <div class="col">
+                        <div class="item range range-positive">
+                            <i class="icon ion-ios-sunny-outline"></i>
+                            <input type="range" name="{{option.name}}" min="0" max="100" value="50">
+                            <i class="icon ion-ios-sunny"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            Name: {{option.name}}"
+                        </div>
+                        <div class="row" ng-if="option.description">
+                            Description: {{option.description}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

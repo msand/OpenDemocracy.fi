@@ -1,0 +1,57 @@
+<ion-view title="New Proposition">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="has-header">
+        <div class="list">
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Proposition Name</span>
+                <input ng-model="proposition.name" type="text" placeholder="Democratically minted crypto currencies vs centrally ruled fiat currency with fractional reserve and interest on interest">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Description</span>
+                <textarea ng-model="proposition.description" placeholder="What kind of money do you prefer? National, monetary union based fiat or decentralized crypto currencies with real accountability, solvency and transparency?"></textarea>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Keywords</span>
+                <input ng-model="proposition.keywords" type="text" placeholder="Electronic, Money, Democratic, Currency, Reserve, Solvency, Accountability, Crypto, Fiat">
+            </label>
+            <div class="item item-divider">
+                Options
+            </div>
+            <div class="item item-input item-stacked-label" ng-repeat="option in proposition.options">
+                <div class="row responsive-sm">
+                    <label class="col">
+                        <span class="input-label">Option Name</span>
+                        <input ng-model="option.name" type="text">
+                    </label>
+                    <label class="col">
+                        <span class="input-label">Description</span>
+                        <input ng-model="option.description" type="text" placeholder="Description">
+                    </label>
+                    <div class="col">
+                        <button class="button button-positive" ng-click="removeOption(option)">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="item item-input item-stacked-label">
+                <div class="row responsive-sm">
+                    <label class="col">
+                        <span class="input-label">New Option Name</span>
+                        <input ng-model="option.name" type="text" placeholder="FIMK">
+                    </label>
+                    <label class="col">
+                        <span class="input-label">Description</span>
+                        <input ng-model="option.description" type="text" placeholder="Democratic crypto currency">
+                    </label>
+                    <div class="col">
+                        <button class="button button-positive" ng-click="addOption()" ng-disabled="!option.name">Add Option</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="padding">
+            <button class="button button-positive" ng-disabled="!proposition.options.length" ng-click="addProposition()">Create Proposition</button>
+        </div>
+    </ion-content>
+</ion-view>
