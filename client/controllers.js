@@ -63,8 +63,43 @@ angular.module('starter.controllers', [])
         });
     }])
 
-    .controller('PropositionCtrl', ['$scope', '$stateParams', '$meteor', function ($scope, $stateParams, $meteor){
-        $scope.proposition = $meteor.object(Propositions, $stateParams.propositionId).subscribe('propositions');
+    .controller('PropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state){
+        var vm = this;
+        var propositionId = $stateParams.propositionId;
+        vm.proposition = $meteor.object(Propositions, propositionId, false).subscribe('propositions');
+        vm.votes = $meteor.collection(function() {
+            return Votes.find({
+                propositionId: propositionId
+            }, {
+                sort : { createdAt: -1 }
+            });
+        });
+        $meteor.subscribe('votes', propositionId).then(function () {
+            var options = vm.proposition.options;
+            var votes = vm.votes && vm.votes[0];
+            if (!votes || !options) {
+                return;
+            }
+            options.forEach(function (option) {
+                var name =  option.name;
+                if (name in votes) {
+                    option.value = votes[name];
+                }
+            });
+        });
+        vm.vote = function vote() {
+            var votes = _.reduce(vm.proposition.options, function (memo, option) {
+                memo[option.name] = option.value;
+                return memo;
+            }, {
+                propositionId: propositionId,
+                userId: Meteor.userId(),
+                createdAt: new Date()
+            });
+            vm.votes.save(votes);
+
+            $state.go('app.propositions');
+        };
     }])
 
     .controller('NewPropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state){

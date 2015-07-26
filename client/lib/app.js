@@ -56,7 +56,7 @@ angular.module('starter', ['angular-meteor', 'ionic', 'angularUtils.directives.d
                 url: "/browse",
                 views: {
                     'menuContent': {
-                        templateUrl: 'client/templates/browse.ng.html',
+                        templateUrl: 'client/templates/browse.ng.html'
                     }
                 }
             })
@@ -75,7 +75,7 @@ angular.module('starter', ['angular-meteor', 'ionic', 'angularUtils.directives.d
                 views: {
                     'menuContent': {
                         templateUrl: 'client/templates/proposition.ng.html',
-                        controller: 'PropositionCtrl'
+                        controller: 'PropositionCtrl as vm'
                     }
                 }
             })
