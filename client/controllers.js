@@ -36,30 +36,29 @@ angular.module('starter.controllers', [])
     .controller('PropositionsCtrl', ['$scope', '$meteor', function ($scope, $meteor) {
         var vm = this;
         vm.page = 1;
-        vm.perPage = 3;
-        vm.sort = { name: 1 };
+        vm.perPage = 5;
+        vm.sort = { createdAt: -1 };
         vm.orderProperty = '1';
-        vm.propositions = $meteor.collection(function() {
-            return Propositions.find({}, {
-                sort : $scope.getReactively('vm.sort')
-            });
-        });
         $meteor.autorun($scope, function() {
             var perPage = parseInt($scope.getReactively('vm.perPage'));
-            $meteor.subscribe('propositions', {
+            var query = {
                 limit: perPage,
                 skip: (parseInt($scope.getReactively('vm.page')) - 1) * perPage,
                 sort: $scope.getReactively('vm.sort')
-            }, $scope.getReactively('vm.search')).then(function(){
-                $scope.propositionsCount = $meteor.object(Counts ,'numberOfPropositions', false);
+            };
+            $meteor.subscribe('propositions', query, $scope.getReactively('vm.search')).then(function(){
+                vm.propositions = $meteor.collection(function() {
+                    return Propositions.find({}, query);
+                });
+                vm.propositionsCount = $meteor.object(Counts ,'numberOfPropositions', false);
             });
         });
-        $scope.pageChanged = function(newPage) {
-            $scope.page = newPage;
+        vm.pageChanged = function(newPage) {
+            vm.page = newPage;
         };
-        $scope.$watch('orderProperty', function(){
-            if ($scope.orderProperty)
-                $scope.sort = {name: parseInt($scope.orderProperty)};
+        $scope.$watch('vm.orderProperty', function(){
+            if (vm.orderProperty)
+                vm.sort = {name: parseInt(vm.orderProperty)};
         });
     }])
 
@@ -120,17 +119,18 @@ angular.module('starter.controllers', [])
                 $scope.proposition.options.splice(i, 1);
             }
         };
-        $scope.propositions = $meteor.collection(Propositions);
+        $scope.propositions = $meteor.collection(Propositions).subscribe('propositions');
         $scope.addProposition = function addProposition() {
             var proposition = $scope.proposition;
             proposition.ownerId = Meteor.userId();
             proposition.owner = Meteor.user();
-            $scope.propositions.save(proposition);
+            proposition.createdAt = new Date();
+            $scope.propositions.save(proposition).then(function(){
+                $state.go('app.propositions');
+            });
             $scope.proposition = {
                 options: []
             };
-
-            $state.go('app.propositions');
         };
     }]);
 

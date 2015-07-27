@@ -12,3 +12,8 @@
 #side-menu-login {
     overflow: visible;
 }
+
+.pagination li {
+    display: inline;
+    padding: 5px;
+}
