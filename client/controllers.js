@@ -64,8 +64,8 @@ angular.module('starter.controllers', ['resultsFilters'])
         var vm = this;
         vm.page = 1;
         vm.perPage = 5;
-        vm.sort = { createdAt: 1 };
-        vm.orderProperty = '1';
+        vm.sort = { createdAt: -1 };
+        vm.orderProperty = '-1';
         $meteor.autorun($scope, function() {
             var perPage = parseInt($scope.getReactively('vm.perPage'));
             var query = {
@@ -85,7 +85,7 @@ angular.module('starter.controllers', ['resultsFilters'])
         };
         $scope.$watch('vm.orderProperty', function(){
             if (vm.orderProperty)
-                vm.sort = {name: parseInt(vm.orderProperty)};
+                vm.sort = {createdAt: parseInt(vm.orderProperty)};
         });
     }])
 
@@ -142,7 +142,7 @@ angular.module('starter.controllers', ['resultsFilters'])
             vm.votes.save(vote).then(function () {
                 if (vm.currentVote[0]) {
                     vm.currentVote[0].votes = votes;
-                    vm.currentVote.update(vm.currentVote[0]);
+                    vm.currentVote[0].save();
                 } else {
                     vm.currentVote.save({
                         propositionId: propositionId,
