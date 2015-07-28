@@ -1,4 +1,4 @@
-<ion-view title="Proposition">
+2<ion-view title="Proposition">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -18,12 +18,13 @@
             </div>
             <div class="card item item-input item-stacked-label" ng-repeat="option in vm.proposition.options">
                 <div class="row responsive-sm">
-                    <div class="col">
+                    <div class="col text-center">
                         <div class="item range range-positive">
                             -100 %
-                            <input type="range" name="{{option.name}}" min="0" max="100" ng-model="option.value">
+                            <input type="range" name="{{option.name}}" min="-100" max="100" step="any" ng-model="option.value">
                             +100 %
                         </div>
+                        {{option.value || 'undefined'}} %
                     </div>
                     <div class="col">
                         <div class="row">
@@ -53,8 +54,8 @@
             <div class="row responsive-sm">
                 <div class="col">
                     <div class="item range range-positive">
-                        <div style="background: #387ef5; width: {{result}}%; height: 25px;"></div>
-                        &nbsp;{{ (-100 + result * 2) }} %
+                        <div style="background: #387ef5; width: {{ ( (result + 100) / 2 ) }}%; height: 25px;"></div>
+                        &nbsp;{{ result }} %
                     </div>
                 </div>
                 <div class="col">
