@@ -16,13 +16,13 @@
             <div class="item item-divider">
                 Options
             </div>
-            <div class="item item-input item-stacked-label" ng-repeat="option in vm.proposition.options">
-                <div class="row">
+            <div class="card item item-input item-stacked-label" ng-repeat="option in vm.proposition.options">
+                <div class="row responsive-sm">
                     <div class="col">
                         <div class="item range range-positive">
-                            <i class="icon ion-ios-sunny-outline"></i>
+                            -100 %
                             <input type="range" name="{{option.name}}" min="0" max="100" ng-model="option.value">
-                            <i class="icon ion-ios-sunny"></i>
+                            +100 %
                         </div>
                     </div>
                     <div class="col">
@@ -38,6 +38,31 @@
         </div>
         <div class="padding">
             <button class="button button-positive" ng-click="vm.vote()">Vote</button>
+        </div>
+        <div class="padding">
+            <button class="button button-positive" ng-click="vm.showResults = !vm.showResults">Toggle results</button>
+            <span class="padding" ng-show="vm.showResults" style="vertical-align: middle;top: 15px;position: relative;">
+                <ng-pluralize count="vm.totalUsersVoted.count"
+                              when="{'0': 'No one voted.',
+                     'one': 'One person voted.',
+                     'other': '{} persons voted.'}">
+                </ng-pluralize>
+            </span>
+        </div>
+        <div class="card item item-input item-stacked-label" ng-repeat="(option, result) in (vm.results | averagePerOption)" ng-show="vm.showResults">
+            <div class="row responsive-sm">
+                <div class="col">
+                    <div class="item range range-positive">
+                        <div style="background: #387ef5; width: {{result}}%; height: 25px;"></div>
+                        &nbsp;{{ (-100 + result * 2) }} %
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        Name: {{option}}
+                    </div>
+                </div>
+            </div>
         </div>
     </ion-content>
 </ion-view>

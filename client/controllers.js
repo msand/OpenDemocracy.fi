@@ -1,4 +1,31 @@
-angular.module('starter.controllers', [])
+angular.module('resultsFilters', [])
+    .filter('averagePerOption', function() {
+        return function (results) {
+            if (!results) return;
+            var n = results.length;
+            var sums = results.reduce(function (memo, result) {
+                var votes = result.votes;
+                for (var name in votes) {
+                    if (votes.hasOwnProperty(name)) {
+                        if (!isFinite(memo[name])) {
+                            memo[name] = +votes[name] || 0;
+                        } else {
+                            memo[name] += +votes[name] || 0;
+                        }
+                    }
+                }
+                return memo;
+            }, {});
+            var avgs = {};
+            for (var name in sums) {
+                if (sums.hasOwnProperty(name)) {
+                    avgs[name] = sums[name] / n;
+                }
+            }
+            return avgs;
+        }
+    });
+angular.module('starter.controllers', ['resultsFilters'])
 
     .controller('AppCtrl', ['$scope', '$ionicModal', '$timeout', function ($scope, $ionicModal, $timeout) {
         // Form data for the login modal
@@ -37,7 +64,7 @@ angular.module('starter.controllers', [])
         var vm = this;
         vm.page = 1;
         vm.perPage = 5;
-        vm.sort = { createdAt: -1 };
+        vm.sort = { createdAt: 1 };
         vm.orderProperty = '1';
         $meteor.autorun($scope, function() {
             var perPage = parseInt($scope.getReactively('vm.perPage'));
@@ -75,10 +102,11 @@ angular.module('starter.controllers', [])
         });
         $meteor.subscribe('votes', propositionId).then(function () {
             var options = vm.proposition.options;
-            var votes = vm.votes && vm.votes[0];
-            if (!votes || !options) {
+            var vote = vm.votes && vm.votes[0];
+            if (!vote || !options) {
                 return;
             }
+            var votes = vote.votes;
             options.forEach(function (option) {
                 var name =  option.name;
                 if (name in votes) {
@@ -86,16 +114,43 @@ angular.module('starter.controllers', [])
                 }
             });
         });
+        $meteor.subscribe('currentvotes', propositionId).then(function () {
+            vm.results = $meteor.collection(function() {
+                return CurrentVotes.find({
+                    propositionId: propositionId
+                });
+            });
+            vm.currentVote = $meteor.collection(function() {
+                return CurrentVotes.find({
+                    propositionId: propositionId,
+                    userId: Meteor.userId()
+                });
+            });
+            vm.totalUsersVoted = $meteor.object(Counts ,'totalUsersVoted', false);
+        });
         vm.vote = function vote() {
             var votes = _.reduce(vm.proposition.options, function (memo, option) {
                 memo[option.name] = option.value;
                 return memo;
-            }, {
+            }, {});
+            var vote = {
                 propositionId: propositionId,
                 userId: Meteor.userId(),
-                createdAt: new Date()
+                createdAt: new Date(),
+                votes: votes
+            };
+            vm.votes.save(vote).then(function () {
+                if (vm.currentVote[0]) {
+                    vm.currentVote[0].votes = votes;
+                    vm.currentVote.update(vm.currentVote[0]);
+                } else {
+                    vm.currentVote.save({
+                        propositionId: propositionId,
+                        userId: Meteor.userId(),
+                        votes: votes
+                    });
+                }
             });
-            vm.votes.save(votes);
 
             $state.go('app.propositions');
         };
