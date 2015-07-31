@@ -5,9 +5,9 @@ Propositions.allow({
         return true;
     },
     update: function (userId, proposition, fields, modifier) {
-        return userId && proposition.owner === userId;
+        return false;
     },
     remove: function (userId, proposition) {
-        return userId && proposition.owner === userId;
+        return false;
     }
 });

@@ -6,10 +6,10 @@ Votes.allow({
         return vote.userId === userId;
     },
     update: function (userId, vote, fields, modifier) {
-        return vote.userId === userId;
+        return false;
     },
     remove: function (userId, vote) {
-        return userId && vote.userId === userId;
+        return false;
     }
 });
 
@@ -21,6 +21,6 @@ CurrentVotes.allow({
         return vote.userId === userId;
     },
     remove: function (userId, vote) {
-        return userId && vote.userId === userId;
+        return false;
     }
 });
