@@ -160,10 +160,8 @@ angular.module('starter.controllers', ['resultsFilters'])
         $scope.proposition = {
             options: []
         };
-        $scope.option = {};
         $scope.addOption = function addOption() {
-            $scope.proposition.options.push($scope.option);
-            $scope.option = {};
+            $scope.proposition.options.push({});
         };
         $scope.removeOption = function removeOption(option) {
             if (!option) {

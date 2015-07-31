@@ -23,11 +23,11 @@
                 <div class="row responsive-sm">
                     <label class="col">
                         <span class="input-label">Option Name</span>
-                        <input ng-model="option.name" type="text">
+                        <input ng-model="option.name" type="text" placeholder="FIMK">
                     </label>
                     <label class="col">
                         <span class="input-label">Description</span>
-                        <input ng-model="option.description" type="text" placeholder="Description">
+                        <input ng-model="option.description" type="text" placeholder="Democratic crypto currency">
                     </label>
                     <div class="col">
                         <button class="button button-positive" ng-click="removeOption(option)">Remove</button>
@@ -36,16 +36,8 @@
             </div>
             <div class="item item-input item-stacked-label">
                 <div class="row responsive-sm">
-                    <label class="col">
-                        <span class="input-label">New Option Name</span>
-                        <input ng-model="option.name" type="text" placeholder="FIMK">
-                    </label>
-                    <label class="col">
-                        <span class="input-label">Description</span>
-                        <input ng-model="option.description" type="text" placeholder="Democratic crypto currency">
-                    </label>
                     <div class="col">
-                        <button class="button button-positive" ng-click="addOption()" ng-disabled="!option.name">Add Option</button>
+                        <button class="button button-positive" ng-click="addOption()">Add Option</button>
                     </div>
                 </div>
             </div>
