@@ -41,16 +41,15 @@
             <button class="button button-positive" ng-click="vm.vote()">Vote</button>
         </div>
         <div class="padding">
-            <button class="button button-positive" ng-click="vm.showResults = !vm.showResults">Toggle results</button>
-            <span class="padding" ng-show="vm.showResults" style="vertical-align: middle;top: 15px;position: relative;">
-                <ng-pluralize count="vm.totalUsersVoted.count"
+            <span class="padding" style="vertical-align: middle;top: 15px;position: relative;">
+                <ng-pluralize count="vm.totalUsersVoted"
                               when="{'0': 'No one voted.',
                      'one': 'One person voted.',
                      'other': '{} persons voted.'}">
                 </ng-pluralize>
             </span>
         </div>
-        <div class="card item item-input item-stacked-label" ng-repeat="(option, result) in (vm.results | averagePerOption)" ng-show="vm.showResults">
+        <div class="card item item-input item-stacked-label" ng-repeat="(option, result) in (vm.results | averagePerOption)">
             <div class="row responsive-sm">
                 <div class="col">
                     <div class="item range range-positive">

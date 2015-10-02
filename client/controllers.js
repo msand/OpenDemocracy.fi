@@ -1,5 +1,5 @@
 angular.module('resultsFilters', [])
-    .filter('averagePerOption', function() {
+    .filter('averagePerOption', function () {
         return function (results) {
             if (!results) return;
             var n = results.length;
@@ -64,99 +64,105 @@ angular.module('starter.controllers', ['resultsFilters'])
         var vm = this;
         vm.page = 1;
         vm.perPage = 5;
-        vm.sort = { createdAt: -1 };
+        vm.sort = {createdAt: -1};
         vm.orderProperty = '-1';
-        $meteor.autorun($scope, function() {
+        $meteor.autorun($scope, function () {
             var perPage = parseInt($scope.getReactively('vm.perPage'));
             var query = {
                 limit: perPage,
                 skip: (parseInt($scope.getReactively('vm.page')) - 1) * perPage,
                 sort: $scope.getReactively('vm.sort')
             };
-            $meteor.subscribe('propositions', query, $scope.getReactively('vm.search')).then(function(){
-                vm.propositions = $meteor.collection(function() {
-                    return Propositions.find({}, query);
+            $meteor.subscribe('propositions', query, $scope.getReactively('vm.search')).then(function () {
+                vm.propositions = $meteor.collection(function () {
+                    return Propositions.find({}, {sort: $scope.getReactively('vm.sort')});
                 });
-                vm.propositionsCount = $meteor.object(Counts ,'numberOfPropositions', false);
+                vm.propositionsCount = $meteor.object(Counts, 'numberOfPropositions', false);
             });
         });
-        vm.pageChanged = function(newPage) {
+        vm.pageChanged = function (newPage) {
             vm.page = newPage;
         };
-        $scope.$watch('vm.orderProperty', function(){
+        $scope.$watch('vm.orderProperty', function () {
             if (vm.orderProperty)
                 vm.sort = {createdAt: parseInt(vm.orderProperty)};
         });
     }])
 
-    .controller('PropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state){
+    .controller('PropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state) {
         var vm = this;
         var propositionId = $stateParams.propositionId;
-        vm.proposition = $meteor.object(Propositions, propositionId, false).subscribe('propositions');
-        vm.votes = $meteor.collection(function() {
-            return Votes.find({
-                propositionId: propositionId
-            }, {
-                sort : { createdAt: -1 }
-            });
-        });
-        $meteor.subscribe('votes', propositionId).then(function () {
-            var options = vm.proposition.options;
-            var vote = vm.votes && vm.votes[0];
-            if (!vote || !options) {
-                return;
-            }
-            var votes = vote.votes;
-            options.forEach(function (option) {
-                var name =  option.name;
-                if (name in votes) {
-                    option.value = votes[name];
+        $meteor.subscribe('propositions').then(function () {
+            vm.proposition = $meteor.object(Propositions, propositionId, false);
+            $meteor.subscribe('votes', propositionId).then(function () {
+                vm.votes = $meteor.collection(function () {
+                    return Votes.find({
+                        propositionId: propositionId
+                    }, {
+                        sort: {createdAt: -1}
+                    });
+                });
+                var options = vm.proposition.options;
+                var vote = vm.votes && vm.votes[0];
+                if (!vote || !options) {
+                    return;
                 }
+                var votes = vote.votes;
+                options.forEach(function (option) {
+                    var name = option.name;
+                    if (name in votes) {
+                        option.value = votes[name];
+                    }
+                });
             });
         });
         $meteor.subscribe('currentvotes', propositionId).then(function () {
-            vm.results = $meteor.collection(function() {
+            vm.results = $meteor.collection(function () {
                 return CurrentVotes.find({
                     propositionId: propositionId
-                });
+                }, {fields: {votes: 1, propositionId: 1}});
             });
-            vm.currentVote = $meteor.collection(function() {
+        });
+        $meteor.call('totalUsersVoted', propositionId).then(
+            function(data){
+                vm.totalUsersVoted = data;
+            }
+        );
+        $meteor.subscribe('currentvote', propositionId).then(function () {
+            vm.currentVote = $meteor.collection(function () {
                 return CurrentVotes.find({
                     propositionId: propositionId,
                     userId: Meteor.userId()
                 });
             });
-            vm.totalUsersVoted = $meteor.object(Counts ,'totalUsersVoted', false);
-        });
-        vm.vote = function vote() {
-            var votes = _.reduce(vm.proposition.options, function (memo, option) {
-                memo[option.name] = option.value;
-                return memo;
-            }, {});
-            var vote = {
-                propositionId: propositionId,
-                userId: Meteor.userId(),
-                createdAt: new Date(),
-                votes: votes
+            vm.vote = function vote() {
+                var votes = _.reduce(vm.proposition.options, function (memo, option) {
+                    memo[option.name] = option.value;
+                    return memo;
+                }, {});
+                var vote = {
+                    propositionId: propositionId,
+                    userId: Meteor.userId(),
+                    createdAt: new Date(),
+                    votes: votes
+                };
+                vm.votes.save(vote).then(function () {
+                    if (vm.currentVote[0]) {
+                        vm.currentVote[0].votes = votes;
+                        vm.currentVote.save(vm.currentVote[0]);
+                    } else {
+                        vm.currentVote.save({
+                            propositionId: propositionId,
+                            userId: Meteor.userId(),
+                            votes: votes
+                        });
+                    }
+                });
             };
-            vm.votes.save(vote).then(function () {
-                if (vm.currentVote[0]) {
-                    vm.currentVote[0].votes = votes;
-                    vm.currentVote[0].save();
-                } else {
-                    vm.currentVote.save({
-                        propositionId: propositionId,
-                        userId: Meteor.userId(),
-                        votes: votes
-                    });
-                }
-            });
-
-            $state.go('app.propositions');
-        };
+        });
     }])
 
-    .controller('NewPropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state){
+    .controller('NewPropositionCtrl', ['$scope', '$stateParams', '$meteor', '$state', function ($scope, $stateParams, $meteor, $state) {
         $scope.proposition = {
             options: []
         };
@@ -180,7 +186,7 @@ angular.module('starter.controllers', ['resultsFilters'])
             proposition.ownerId = Meteor.userId();
             proposition.owner = Meteor.user();
             proposition.createdAt = new Date();
-            $scope.propositions.save(proposition).then(function(){
+            $scope.propositions.save(proposition).then(function () {
                 $state.go('app.propositions');
             });
             $scope.proposition = {
